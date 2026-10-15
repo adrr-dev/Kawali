@@ -1,0 +1,35 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// ChatData diisi handler /chat/:id.
+type ChatData struct {
+	Thread   models.ChatThread
+	Messages []models.ChatMessage
+	PeerName string
+	Me       uint
+}
+
+// Chat menampilkan pesan (polling HTMX) + composer.
+templ Chat(d ChatData) {
+	@layout.Base("Chat") {
+		<main class="page">
+			<h1 class="title">CHAT</h1>
+			<p class="muted">{ d.PeerName }</p>
+			<div id="msgs" hx-get={ "/partial/chat/" + components.Utoa(d.Thread.ID) } hx-trigger="every 5s" hx-swap="innerHTML">
+				for _, m := range d.Messages {
+					@components.ChatBubble(m, m.SenderID == d.Me)
+				}
+			</div>
+			<form method="POST" action={ templ.URL("/chat/" + components.Utoa(d.Thread.ID)) } class="composer">
+				<input type="text" name="body" placeholder="Tulis pesan..." required/>
+				<button type="submit" aria-label="Kirim">➤</button>
+			</form>
+		</main>
+		@components.Dock("beranda")
+	}
+}

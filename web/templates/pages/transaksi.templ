@@ -1,0 +1,37 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// TransaksiData diisi handler /transaksi/:id (status + aksi lanjut).
+type TransaksiData struct {
+	Order    models.Order
+	Product  models.Product
+	IsBuyer  bool
+	ThreadID uint
+}
+
+// Transaksi menampilkan status order P2P dan tautan lanjut.
+templ Transaksi(d TransaksiData) {
+	@layout.Base("Transaksi") {
+		<main class="page">
+			<h1 class="title">TRANSAKSI</h1>
+			<div class="statuscard">
+				<p><strong>{ d.Product.Name }</strong></p>
+				<p class="muted">Total { components.PriceID(d.Order.Total) } · { d.Order.Status }</p>
+			</div>
+			if d.Order.Status == "pending" {
+				<form method="POST" action={ templ.URL("/transaksi/" + components.Utoa(d.Order.ID) + "/selesai") } class="form">
+					<button class="btn" type="submit">Tandai Selesai (sudah ketemuan)</button>
+				</form>
+			} else {
+				<p><a class="btn btn--link" href={ templ.URL("/sukses/" + components.Utoa(d.Order.ID)) }>Lihat Hasil</a></p>
+			}
+			<p><a class="btn btn--link" href={ templ.URL("/chat/" + components.Utoa(d.ThreadID)) }>Chat</a></p>
+		</main>
+		@components.Dock("beranda")
+	}
+}

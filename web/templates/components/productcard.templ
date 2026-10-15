@@ -1,0 +1,18 @@
+package components
+
+import (
+	"mewali/internal/models"
+)
+
+// ProductCard adalah kartu produk 3:4 khas MEWALI (foto + badge harga + meta).
+templ ProductCard(p models.Product, coverURL string) {
+	<article class="card">
+		<a href={ templ.URL("/produk/" + Utoa(p.ID)) } aria-label={ p.Name }>
+			<img src={ coverURL } alt={ p.Name } loading="lazy"/>
+			<span class="card__price">{ ShortPrice(p.Price) }</span>
+			<div class="card__meta">
+				<h3>{ p.Name }</h3>
+			</div>
+		</a>
+	</article>
+}

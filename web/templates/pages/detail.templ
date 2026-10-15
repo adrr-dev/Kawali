@@ -1,0 +1,72 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/internal/sizematch"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// DetailData diisi handler /produk/:id.
+type DetailData struct {
+	Product models.Product
+	Seller  models.User
+	Cover   string
+	Match   sizematch.Result
+	Logged  bool
+	IsOwn   bool
+	Defects []models.Defect
+	Score   int
+	Scored  bool
+	Rating  string
+}
+
+// Detail menampilkan galeri, harga, penjual, kecocokan, cacat, dan CTA.
+templ Detail(d DetailData) {
+	@layout.Base(d.Product.Name) {
+		<main class="page">
+			<div class="gallery">
+				<img src={ d.Cover } alt={ d.Product.Name }/>
+			</div>
+			<h1 class="title">{ d.Product.Name }</h1>
+			<p class="price">{ components.PriceID(d.Product.Price) }</p>
+			<a class="seller" href={ templ.URL("/profil/" + d.Seller.Handle) }>
+				<span>🏪 { d.Seller.Name }</span>
+				<span class="muted">{ d.Rating }</span>
+			</a>
+			if d.Scored {
+				<p>Kondisi: <strong>{ components.Itoa(d.Score) }/100</strong> <span class="muted">(aturan kelengkapan)</span></p>
+			}
+			if d.Logged {
+				@components.MatchBar(d.Match)
+			} else {
+				<p class="muted"><a href="/login">Login</a> untuk melihat kecocokan dengan ukuranmu.</p>
+			}
+			if len(d.Defects) > 0 {
+				<h2>Cacat yang ditandai penjual</h2>
+				<ol class="defects">
+					for i, cf := range d.Defects {
+						<li><span class="defno">{ components.Itoa(i + 1) }.</span> { cf.Label }</li>
+					}
+				</ol>
+			}
+			<div class="ctarow">
+				<form method="POST" action="/cart">
+					<input type="hidden" name="product_id" value={ components.Utoa(d.Product.ID) }/>
+					<button class="iconbtn" type="submit" aria-label="Tambah ke keranjang">🛒</button>
+				</form>
+				<form method="POST" action="/checkout" class="grow">
+					<input type="hidden" name="product_id" value={ components.Utoa(d.Product.ID) }/>
+					<button class="btn" type="submit">Beli sekarang</button>
+				</form>
+			</div>
+			if d.Logged && !d.IsOwn {
+				<form method="POST" action="/chat/mulai">
+					<input type="hidden" name="product_id" value={ components.Utoa(d.Product.ID) }/>
+					<button class="btn btn--ghost" type="submit">Chat Penjual</button>
+				</form>
+			}
+		</main>
+		@components.Dock("beranda")
+	}
+}

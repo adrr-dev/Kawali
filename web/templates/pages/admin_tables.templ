@@ -1,0 +1,102 @@
+package pages
+
+import (
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// AdminReportRow satu baris laporan.
+type AdminReportRow struct {
+	ID     uint
+	Reason string
+	Status string
+}
+
+// AdminProductRow satu baris produk.
+type AdminProductRow struct {
+	ID     uint
+	Name   string
+	Status string
+}
+
+// AdminOrderRow satu baris transaksi.
+type AdminOrderRow struct {
+	ID     uint
+	Total  int
+	Pay    string
+	Mode   string
+	Status string
+}
+
+// AdminLaporan menampilkan antrean moderasi laporan.
+templ AdminLaporan(rows []AdminReportRow) {
+	@layout.Base("Admin Laporan") {
+		<main class="page">
+			<h1 class="title">LAPORAN</h1>
+			<p><a href="/admin">← Ringkasan</a></p>
+			<table class="admtable">
+				<tr><th>ID</th><th>Alasan</th><th>Status</th><th>Aksi</th></tr>
+				for _, r := range rows {
+					<tr>
+						<td>{ components.Utoa(r.ID) }</td>
+						<td>{ r.Reason }</td>
+						<td>{ r.Status }</td>
+						<td>
+							<form method="POST" action={ templ.URL("/admin/laporan/" + components.Utoa(r.ID)) }>
+								<button name="aksi" value="resolve" type="submit">Resolve</button>
+								<button name="aksi" value="reject" type="submit">Reject</button>
+							</form>
+						</td>
+					</tr>
+				}
+			</table>
+		</main>
+	}
+}
+
+// AdminProduk menampilkan listing + takedown.
+templ AdminProduk(rows []AdminProductRow) {
+	@layout.Base("Admin Produk") {
+		<main class="page">
+			<h1 class="title">PRODUK</h1>
+			<p><a href="/admin">← Ringkasan</a></p>
+			<table class="admtable">
+				<tr><th>ID</th><th>Nama</th><th>Status</th><th>Aksi</th></tr>
+				for _, p := range rows {
+					<tr>
+						<td>{ components.Utoa(p.ID) }</td>
+						<td>{ p.Name }</td>
+						<td>{ p.Status }</td>
+						<td>
+							<form method="POST" action={ templ.URL("/admin/produk/" + components.Utoa(p.ID) + "/takedown") }>
+								<button type="submit">Takedown</button>
+							</form>
+						</td>
+					</tr>
+				}
+			</table>
+		</main>
+	}
+}
+
+// AdminTransaksi menampilkan daftar transaksi read-only.
+templ AdminTransaksi(rows []AdminOrderRow) {
+	@layout.Base("Admin Transaksi") {
+		<main class="page">
+			<h1 class="title">TRANSAKSI</h1>
+			<p><a href="/admin">← Ringkasan</a></p>
+			<table class="admtable">
+				<tr><th>ID</th><th>Total</th><th>Bayar</th><th>Mode</th><th>Status</th></tr>
+				for _, o := range rows {
+					<tr>
+						<td>{ components.Utoa(o.ID) }</td>
+						<td>{ components.PriceID(o.Total) }</td>
+						<td>{ o.Pay }</td>
+						<td>{ o.Mode }</td>
+						<td>{ o.Status }</td>
+					</tr>
+				}
+			</table>
+		</main>
+	}
+}

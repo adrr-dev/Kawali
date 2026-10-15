@@ -1,0 +1,10 @@
+.env
+*.db
+*.sqlite*
+*.sqlite-journal
+dev.db*
+web/static/uploads/*
+!web/static/uploads/.gitkeep
+dist/
+bin/
+node_modules/

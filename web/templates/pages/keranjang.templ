@@ -1,0 +1,43 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// CartData diisi handler /keranjang.
+type CartData struct {
+	Items  []models.Product
+	Covers map[uint]string
+	Total  int
+}
+
+// Keranjang menampilkan item + total + CTA Beli.
+templ Keranjang(d CartData) {
+	@layout.Base("Keranjang") {
+		<main class="page">
+			<h1 class="title">KERANJANG</h1>
+			if len(d.Items) == 0 {
+				<p class="muted">Keranjang kosong. <a href="/cari">Cari pakaian</a>.</p>
+			} else {
+				for _, p := range d.Items {
+					<div class="cartrow">
+						<img src={ d.Covers[p.ID] } alt={ p.Name } loading="lazy"/>
+						<div>
+							<p><strong>{ p.Name }</strong></p>
+							<p class="muted">{ components.PriceID(p.Price) }</p>
+							<span class="ptsbadge">+10 Poin</span>
+						</div>
+					</div>
+				}
+				<p>Total <strong>{ components.PriceID(d.Total) }</strong></p>
+				<form method="POST" action="/beli">
+					<input type="hidden" name="product_id" value={ components.Utoa(d.Items[0].ID) }/>
+					<button class="btn" type="submit">Beli</button>
+				</form>
+			}
+		</main>
+		@components.Dock("beranda")
+	}
+}

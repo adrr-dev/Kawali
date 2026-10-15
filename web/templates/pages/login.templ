@@ -1,0 +1,27 @@
+package pages
+
+import (
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// Login menampilkan form masuk + akun filler untuk testing.
+templ Login(errMsg string) {
+	@layout.Base("Login") {
+		<main class="page page--center">
+			<h1 class="title">LOGIN</h1>
+			<p class="muted">Selamat datang kembali.</p>
+			if errMsg != "" {
+				<p class="formerror" role="alert">{ errMsg }</p>
+			}
+			<form method="POST" action="/login" class="form">
+				@components.Field("email", "email", "Email", "email")
+				@components.Field("password", "password", "Sandi", "current-password")
+				<button class="btn" type="submit">Login</button>
+			</form>
+			<p class="muted">Testing: pembeli@test.id / penjual@test.id / admin@test.id — sandi: password</p>
+			<p><a href="/lupa-sandi">Lupa Sandi?</a></p>
+			<p>Tidak Punya Akun? <a href="/signup"><strong>Sign Up</strong></a></p>
+		</main>
+	}
+}

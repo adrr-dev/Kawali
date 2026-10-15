@@ -1,0 +1,29 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// SuksesData diisi handler /sukses/:id.
+type SuksesData struct {
+	Order  models.Order
+	Points int
+}
+
+// Sukses menampilkan penyelesaian + poin yang benar-benar masuk ledger.
+templ Sukses(d SuksesData) {
+	@layout.Base("Pembelian Selesai") {
+		<main class="page page--center">
+			<p class="blob">✓</p>
+			if d.Points > 0 {
+				<span class="ptsbadge">+{ components.Itoa(d.Points) } Poin</span>
+			}
+			<h1 class="title">Pembelian Selesai</h1>
+			<p class="muted">Dengan memilih pakaian pre-loved, kamu ikut memperpanjang siklus hidup pakaian dan membantu menciptakan masa depan fashion yang lebih berkelanjutan.</p>
+			<p><a class="btn btn--link" href="/">Kembali Ke Beranda</a></p>
+		</main>
+		@components.Dock("beranda")
+	}
+}

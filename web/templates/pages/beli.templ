@@ -1,0 +1,52 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// BeliData diisi handler /beli.
+type BeliData struct {
+	Product  models.Product
+	Cover    string
+	NeedLoc  bool
+	Error    string
+}
+
+// Beli menampilkan ringkasan + lokasi + metode (cash/transfer;
+// gateway & shipping disabled "Fitur belum tersedia").
+templ Beli(d BeliData) {
+	@layout.Base("Beli") {
+		<main class="page">
+			<h1 class="title">BELI</h1>
+			if d.Error != "" {
+				<p class="formerror" role="alert">{ d.Error }</p>
+			}
+			if d.NeedLoc {
+				<p class="warn">Kamu belum mengatur lokasi, <a href="/preferensi">atur lokasi dulu di sini</a>.</p>
+			}
+			<div class="cartrow">
+				<img src={ d.Cover } alt={ d.Product.Name }/>
+				<div>
+					<p><strong>{ d.Product.Name }</strong></p>
+					<p class="muted">Subtotal { components.PriceID(d.Product.Price) }</p>
+				</div>
+			</div>
+			<form method="POST" action="/checkout" class="form">
+				<input type="hidden" name="product_id" value={ components.Utoa(d.Product.ID) }/>
+				<h2>Metode Pembayaran</h2>
+				<label class="radio"><input type="radio" name="pay" value="cash" checked/> Cash</label>
+				<label class="radio"><input type="radio" name="pay" value="transfer_manual"/> Transfer ke Penjual</label>
+				<label class="radio is-disabled"><input type="radio" disabled/> QRIS / E-wallet <span class="muted">(Fitur belum tersedia)</span></label>
+				<h2>Cara Transaksi</h2>
+				<label class="radio"><input type="radio" name="mode" value="meetup" checked/> Ketemuan + kode konfirmasi</label>
+				<label class="radio"><input type="radio" name="mode" value="p2p"/> Chat + ketemuan (P2P)</label>
+				<label class="radio is-disabled"><input type="radio" disabled/> Kirim paket <span class="muted">(Fitur belum tersedia)</span></label>
+				<p>Total <strong>{ components.PriceID(d.Product.Price) }</strong></p>
+				<button class="btn" type="submit">Bayar</button>
+			</form>
+		</main>
+		@components.Dock("beranda")
+	}
+}

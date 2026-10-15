@@ -1,0 +1,102 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// EditData diisi handler /katalog/:id (milik penjual).
+type EditData struct {
+	Product models.Product
+	Slots   []string
+	Filled  map[string]bool
+	Missing []string
+	Photos  map[string][]models.ProductPhoto
+	AllPics []models.ProductPhoto
+	Defects []models.Defect
+	Sizes   models.ProductSize
+	Error   string
+}
+
+// EditKatalog menampilkan checklist foto, ukuran, penanda cacat, dan terbit.
+templ EditKatalog(d EditData) {
+	@layout.Base("Edit Katalog") {
+		<main class="page">
+			<h1 class="title">EDIT KATALOG</h1>
+			<p><strong>{ d.Product.Name }</strong> <span class="muted">({ d.Product.Status })</span></p>
+			if d.Error != "" {
+				<p class="formerror" role="alert">{ d.Error }</p>
+			}
+			if len(d.Missing) > 0 {
+				<p class="muted">Foto kurang: { joinComma(d.Missing) }. Skor muncul setelah 6 slot terisi.</p>
+			}
+			<h2>Foto per slot</h2>
+			for _, s := range d.Slots {
+				<section class="slot">
+					<h3>{ s } { slotCheck(d.Filled[s]) }</h3>
+					<div class="thumbs">
+						for _, ph := range d.Photos[s] {
+							<img src={ ph.URL } alt={ s } loading="lazy"/>
+						}
+					</div>
+					<form method="POST" action={ templ.URL("/katalog/" + components.Utoa(d.Product.ID) + "/foto") } enctype="multipart/form-data" class="form">
+						<input type="hidden" name="slot" value={ s }/>
+						<input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required/>
+						<button class="btn" type="submit">Unggah foto</button>
+					</form>
+				</section>
+			}
+			<h2>Tandai cacat (klik foto)</h2>
+			if len(d.AllPics) > 0 {
+				<img id="markimg" src={ d.AllPics[0].URL } alt="Tandai cacat" data-photoid={ components.Utoa(d.AllPics[0].ID) }/>
+				<form method="POST" action={ templ.URL("/katalog/" + components.Utoa(d.Product.ID) + "/cacat") } class="form">
+					<input type="hidden" id="fphotoid" name="photo_id" value={ components.Utoa(d.AllPics[0].ID) }/>
+					<label class="field"><input type="number" id="fx" name="x" min="0" max="1000" placeholder="X (0-1000)" required/></label>
+					<label class="field"><input type="number" id="fy" name="y" min="0" max="1000" placeholder="Y (0-1000)" required/></label>
+					<label class="field"><input type="text" name="label" placeholder="Deskripsi cacat" required/></label>
+					<button class="btn" type="submit">Tambah penanda</button>
+				</form>
+				<script>
+					var img = document.getElementById('markimg');
+					img.addEventListener('click', function(e) {
+						var r = img.getBoundingClientRect();
+						document.getElementById('fx').value = Math.round((e.clientX - r.left) / r.width * 1000);
+						document.getElementById('fy').value = Math.round((e.clientY - r.top) / r.height * 1000);
+					});
+				</script>
+			} else {
+				<p class="muted">Unggah foto dulu untuk menandai cacat.</p>
+			}
+			if len(d.Defects) > 0 {
+				<ol class="defects">
+					for i, cf := range d.Defects {
+						<li><span class="defno">{ components.Itoa(i + 1) }.</span> { cf.Label }</li>
+					}
+				</ol>
+			}
+			<form method="POST" action={ templ.URL("/katalog/" + components.Utoa(d.Product.ID) + "/publish") } class="form">
+				<button class="btn" type="submit">Cek Rating & Terbitkan</button>
+			</form>
+		</main>
+		@components.Dock("profil")
+	}
+}
+
+func joinComma(ss []string) string {
+	out := ""
+	for i, s := range ss {
+		if i > 0 {
+			out += ", "
+		}
+		out += s
+	}
+	return out
+}
+
+func slotCheck(ok bool) string {
+	if ok {
+		return "✓"
+	}
+	return "○"
+}

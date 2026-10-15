@@ -1,0 +1,60 @@
+package pages
+
+import (
+	"strconv"
+
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// KonfirmasiData diisi handler /konfirmasi/:id.
+type KonfirmasiData struct {
+	OrderID   uint
+	OwnCode   string
+	ExpiresAt int64
+	IAmBuyer  bool
+	ThreadID  uint
+	Error     string
+}
+
+// Konfirmasi menampilkan kode sendiri + input kode lawan + timer.
+templ Konfirmasi(d KonfirmasiData) {
+	@layout.Base("Konfirmasi") {
+		<main class="page page--center">
+			<h1 class="title">KONFIRMASI</h1>
+			<div class="codecard">
+				<p class="muted">Berikan kode ini kepada { lawan(d.IAmBuyer) } jika barang sesuai:</p>
+				<p class="bigcode">{ d.OwnCode }</p>
+			</div>
+			<div
+				x-data={ "{ exp: " + strconv.FormatInt(d.ExpiresAt, 10) + ", left: 0 }" }
+				x-init="left = Math.max(0, exp - Math.floor(Date.now()/1000)); setInterval(() => left = Math.max(0, exp - Math.floor(Date.now()/1000)), 1000)"
+			>
+				<p>Sisa waktu: <span class="timerpill" x-text="Math.floor(left/60) + 'm ' + (left%60) + 's'"></span></p>
+			</div>
+			if d.Error != "" {
+				<p class="formerror" role="alert">{ d.Error }</p>
+			}
+			<form method="POST" action={ templ.URL("/konfirmasi/" + components.Utoa(d.OrderID)) } class="form">
+				<label class="field"><input type="text" name="code" maxlength="5" minlength="5" placeholder="Kode dari lawan" inputmode="text" autocomplete="one-time-code" required/></label>
+				<button class="btn" type="submit">Konfirmasi</button>
+			</form>
+			<p><a class="btn btn--link" href={ templ.URL("/chat/" + components.Utoa(d.ThreadID)) }>Chat { lawanLong(d.IAmBuyer) }</a></p>
+		</main>
+		@components.Dock("beranda")
+	}
+}
+
+func lawan(buyer bool) string {
+	if buyer {
+		return "penjual"
+	}
+	return "pembeli"
+}
+
+func lawanLong(buyer bool) string {
+	if buyer {
+		return "Penjual"
+	}
+	return "Pembeli"
+}

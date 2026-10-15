@@ -1,0 +1,86 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// EligibleOrder order yang boleh diulas dari halaman profil penjual.
+type EligibleOrder struct {
+	OrderID     uint
+	ProductName string
+}
+
+// ProfilOrangData diisi handler /profil/:handle.
+type ProfilOrangData struct {
+	User     models.User
+	Rating   string
+	Items    []models.Product
+	Covers   map[uint]string
+	Reviews  []ReviewView
+	Eligible []EligibleOrder
+}
+
+// ProfilOrang menampilkan profil publik + ulasan + lapor.
+templ ProfilOrang(d ProfilOrangData) {
+	@layout.Base(d.User.Name) {
+		<main class="page">
+			<div class="who">
+				<span class="avatar">{ initial(d.User.Name) }</span>
+				<div>
+					<p><strong>{ d.User.Name }</strong></p>
+					<p class="muted">{ components.At(d.User.Handle) } · { d.Rating }</p>
+				</div>
+				<form method="POST" action="/lapor" class="reportline">
+					<input type="hidden" name="target_user_id" value={ components.Utoa(d.User.ID) }/>
+					<input type="hidden" name="reason" value="lainnya"/>
+					<input type="hidden" name="back" value={ "/profil/" + d.User.Handle }/>
+					<button class="btn btn--danger-soft" type="submit">Laporkan</button>
+				</form>
+			</div>
+			<h2>Barang Dijual</h2>
+			if len(d.Items) == 0 {
+				<p class="muted">Belum ada barang yang dijual.</p>
+			} else {
+				<div class="grid">
+					for _, p := range d.Items {
+						@components.ProductCard(p, d.Covers[p.ID])
+					}
+				</div>
+			}
+			if len(d.Eligible) > 0 {
+				<h2>Tambahkan Ulasan</h2>
+				<form method="POST" action="/ulasan" class="form">
+					<label class="field">
+						<select name="order_id">
+							for _, e := range d.Eligible {
+								<option value={ components.Utoa(e.OrderID) }>{ e.ProductName }</option>
+							}
+						</select>
+					</label>
+					<label class="field">
+						<select name="stars">
+							<option value="5">5 / 5 ★</option>
+							<option value="4">4 / 5 ★</option>
+							<option value="3">3 / 5 ★</option>
+							<option value="2">2 / 5 ★</option>
+							<option value="1">1 / 5 ★</option>
+						</select>
+					</label>
+					<label class="field"><input type="text" name="body" placeholder="Ceritakan pengalamanmu..."/></label>
+					<button class="btn" type="submit">Kirim Ulasan</button>
+				</form>
+			}
+			<h2>Ulasan</h2>
+			if len(d.Reviews) == 0 {
+				<p class="muted">Belum ada ulasan.</p>
+			} else {
+				for _, r := range d.Reviews {
+					@ReviewCard(r)
+				}
+			}
+		</main>
+		@components.Dock("profil")
+	}
+}

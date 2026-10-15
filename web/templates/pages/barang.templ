@@ -1,0 +1,33 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// BarangData diisi handler /barang-dijual.
+type BarangData struct {
+	Items  []models.Product
+	Covers map[uint]string
+}
+
+// BarangDijual menampilkan kelolaan penjual + status + CTA tambah.
+templ BarangDijual(d BarangData) {
+	@layout.Base("Barang Dijual") {
+		<main class="page">
+			<h1 class="title">BARANG DIJUAL</h1>
+			if len(d.Items) == 0 {
+				<p class="muted">Belum ada barang yang dijual.</p>
+			} else {
+				<div class="grid">
+					for _, p := range d.Items {
+						@components.ProductCard(p, d.Covers[p.ID])
+					}
+				</div>
+			}
+			<p><a class="btn btn--link" href="/tambah">+ Tambah katalog</a></p>
+		</main>
+		@components.Dock("profil")
+	}
+}

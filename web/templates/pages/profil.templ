@@ -1,0 +1,81 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// ReviewView satu ulasan untuk template profil.
+type ReviewView struct {
+	ReviewerName string
+	Stars        int
+	Body         string
+}
+
+// ProfilData diisi handler /profil.
+type ProfilData struct {
+	User         models.User
+	ProductCount int64
+	Rating       string
+	Balance      int
+	Level        string
+	Items        []models.Product
+	Covers       map[uint]string
+	Reviews      []ReviewView
+}
+
+// Profil menampilkan profil sendiri + barang + poin + ulasan.
+templ Profil(d ProfilData) {
+	@layout.Base("Profil") {
+		<main class="page">
+			<h1 class="title">PROFIL</h1>
+			<div class="who">
+				<span class="avatar">{ initial(d.User.Name) }</span>
+				<div>
+					<p><strong>{ d.User.Name }</strong></p>
+					<p class="muted">{ components.At(d.User.Handle) } · { components.Itoa64(d.ProductCount) } Produk · { d.Rating }</p>
+				</div>
+			</div>
+			<h2>Barang Dijual</h2>
+			if len(d.Items) == 0 {
+				<p class="muted">Belum ada barang yang dijual.</p>
+			} else {
+				<div class="grid">
+					for _, p := range d.Items {
+						@components.ProductCard(p, d.Covers[p.ID])
+					}
+				</div>
+			}
+			<p><a href="/barang-dijual">Lihat Barang Dijual</a> · <a href="/tambah">+ Tambah</a></p>
+			<h2>Poin & Dampak</h2>
+			<p><strong>{ components.Itoa(d.Balance) }</strong> poin · { d.Level } · <a href="/poin">Lihat Poin</a></p>
+			<h2>Ulasan</h2>
+			if len(d.Reviews) == 0 {
+				<p class="muted">Belum ada ulasan.</p>
+			} else {
+				for _, r := range d.Reviews {
+					@ReviewCard(r)
+				}
+			}
+			<p><a href="/preferensi">Pengaturan & Preferensi</a></p>
+			<form method="POST" action="/logout"><button class="btn btn--ghost" type="submit">Keluar</button></form>
+		</main>
+		@components.Dock("profil")
+	}
+}
+
+// ReviewCard satu kartu ulasan.
+templ ReviewCard(r ReviewView) {
+	<div class="review">
+		<p><strong>{ r.ReviewerName }</strong> <span class="muted">{ components.Itoa(r.Stars) } / 5 ★</span></p>
+		<p>{ r.Body }</p>
+	</div>
+}
+
+func initial(name string) string {
+	for _, ch := range name {
+		return string(ch)
+	}
+	return "?"
+}

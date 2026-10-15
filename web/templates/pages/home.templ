@@ -1,0 +1,58 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// HomeData diisi handler Beranda.
+type HomeData struct {
+	Banners []models.Banner
+	Baru    []models.Product
+	Pick    []models.Product
+	Covers  map[uint]string
+}
+
+// Home menampilkan header, banner, kategori, Barang Baru, Rekomendasi.
+templ Home(d HomeData) {
+	@layout.Base("Beranda") {
+		<header class="page-head">
+			<p class="wordmark">MEWALI</p>
+			<a class="iconbtn" href="/keranjang" aria-label="Keranjang">🛒</a>
+		</header>
+		<main class="page">
+			<div class="carousel">
+				for _, b := range d.Banners {
+					<section class="banner">
+						<p><strong>{ b.Title }</strong></p>
+						<p class="muted">{ b.Subtitle }</p>
+						<p><a href={ templ.URL(b.CTAHref) }>{ b.CTALabel }</a></p>
+					</section>
+				}
+			</div>
+			<div class="chips" role="list">
+				for _, c := range models.Categories {
+					<a class="chip" href={ templ.URL("/cari?cat=" + c) }>{ c }</a>
+				}
+			</div>
+			<h2>Barang Baru <a class="muted" href="/cari">Lihat Lebih →</a></h2>
+			if len(d.Baru) == 0 {
+				<p class="muted">Belum ada barang. <a href="/tambah">Mulai Jual</a>.</p>
+			} else {
+				<div class="grid">
+					for _, p := range d.Baru {
+						@components.ProductCard(p, d.Covers[p.ID])
+					}
+				</div>
+			}
+			<h2>Rekomendasi</h2>
+			<div class="grid">
+				for _, p := range d.Pick {
+					@components.ProductCard(p, d.Covers[p.ID])
+				}
+			</div>
+		</main>
+		@components.Dock("beranda")
+	}
+}

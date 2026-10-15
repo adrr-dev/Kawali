@@ -1,0 +1,29 @@
+package components
+
+// Dock adalah navigasi kapsul melayang: Beranda · Peta · Profil | Cari.
+// active: "beranda" | "peta" | "profil" | "cari".
+templ Dock(active string) {
+	<nav class="dock" aria-label="Navigasi utama">
+		<div class="dock__pill">
+			<a href="/" class={ "dock__item", templ.KV("is-active", active == "beranda") } aria-label="Beranda">
+				<span aria-hidden="true">⌂</span>
+				if active == "beranda" {
+					<span>Beranda</span>
+				}
+			</a>
+			<a href="/peta" class={ "dock__item", templ.KV("is-active", active == "peta") } aria-label="Peta">
+				<span aria-hidden="true">◎</span>
+				if active == "peta" {
+					<span>Peta</span>
+				}
+			</a>
+			<a href="/profil" class={ "dock__item", templ.KV("is-active", active == "profil") } aria-label="Profil">
+				<span aria-hidden="true">○</span>
+				if active == "profil" {
+					<span>Profil</span>
+				}
+			</a>
+		</div>
+		<a href="/cari" class="dock__search" aria-label="Cari"><span aria-hidden="true">⌕</span></a>
+	</nav>
+}

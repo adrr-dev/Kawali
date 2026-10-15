@@ -1,0 +1,29 @@
+package pages
+
+import (
+	"mewali/web/templates/layout"
+)
+
+// Onboarding menampilkan 4 langkah pengenalan (satu halaman geser).
+templ Onboarding() {
+	@layout.Base("Selamat Datang") {
+		<main class="page page--center">
+			<p class="wordmark wordmark--big">MEWALI</p>
+			<p class="tagline">NEW LIFE, SAME STYLE</p>
+			<section class="onbo">
+				<h1 class="title">SELAMAT DATANG di MEWALI</h1>
+				<p>Kami senang kamu di sini!</p>
+			</section>
+			<section class="onbo">
+				<h2>Apa itu MEWALI?</h2>
+				<p>MEWALI adalah aplikasi jual beli pakaian thrift yang mengutamakan keamanan, kenyamanan, dan kemudahan transaksi sekaligus mendukung pengurangan limbah tekstil.</p>
+			</section>
+			<section class="onbo">
+				<h2>Dampak Kita</h2>
+				<p>Kurangi limbah tekstil dan beri pakaian kesempatan kedua melalui jual beli dan donasi.</p>
+			</section>
+			<p><a class="btn btn--link" href="/signup">Selanjutnya</a></p>
+			<p><a href="/login">Sudah punya akun? Login</a></p>
+		</main>
+	}
+}

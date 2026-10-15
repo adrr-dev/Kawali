@@ -1,0 +1,49 @@
+package pages
+
+import (
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// PetaPin satu penanda: produk atau donasi (dibedakan + legenda).
+type PetaPin struct {
+	Name string
+	URL  string
+	Kind string // produk | donasi
+	Dist string
+}
+
+// PetaData diisi handler /peta.
+type PetaData struct {
+	Lat    float64
+	Lng    float64
+	HasLoc bool
+	Pins   []PetaPin
+}
+
+// Peta menampilkan permukaan statis + daftar pin dengan jarak.
+templ Peta(d PetaData) {
+	@layout.Base("Peta") {
+		<main class="page">
+			<h1 class="title">PETA</h1>
+			<div class="mapface" role="img" aria-label="Peta sekitar (ilustrasi)">
+				<p class="muted">Area sekitar · <span class="pin pin--produk">●</span> produk <span class="pin pin--donasi">●</span> donasi</p>
+			</div>
+			if !d.HasLoc {
+				<p class="warn">Lokasi belum diatur. <a href="/preferensi">Atur lokasi</a> atau <a href="/peta?lat=-6.2&lng=106.8">pakai Jakarta sebagai contoh</a>.</p>
+			}
+			if len(d.Pins) == 0 {
+				<p class="muted">Belum ada penanda di sekitarmu.</p>
+			} else {
+				for _, pin := range d.Pins {
+					<div class="pinrow">
+						<span class={ "pin", "pin--" + pin.Kind }>●</span>
+						<a href={ templ.URL(pin.URL) }>{ pin.Name }</a>
+						<span class="muted">{ pin.Dist }</span>
+					</div>
+				}
+			}
+		</main>
+		@components.Dock("peta")
+	}
+}

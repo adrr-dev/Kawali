@@ -1,0 +1,30 @@
+package components
+
+import (
+	"fmt"
+
+	"mewali/internal/sizematch"
+)
+
+// MatchBar menampilkan kecocokan ukuran + perbandingan cm.
+// Bila incomplete: jelaskan + arahkan lengkapi preferensi (DESIGN Bab detail).
+templ MatchBar(r sizematch.Result) {
+	<div class="match">
+		if r.Complete {
+			<p>Kecocokan dengan ukuranmu <strong>{ fmt.Sprint(r.Score) }%</strong></p>
+			<div class="bar"><i style={ "width:" + fmt.Sprint(r.Score) + "%" }></i></div>
+			for _, d := range r.Dims {
+				<div class="measure">
+					<span class="muted">{ d.Name } barang / kamu</span>
+					<span><strong>{ fmtTrim(d.Item) } / { fmtTrim(d.User) } cm</strong></span>
+				</div>
+			}
+		} else {
+			<p class="muted">Kecocokan belum dapat dihitung. <a href="/preferensi">Lengkapi preferensi ukuranmu</a>.</p>
+		}
+	</div>
+}
+
+func fmtTrim(f float64) string {
+	return fmt.Sprintf("%g", f)
+}

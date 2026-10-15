@@ -1,0 +1,25 @@
+package components
+
+import (
+	"mewali/internal/models"
+)
+
+// ChatBubble menampilkan satu pesan; own=true bila pengirim = viewer.
+templ ChatBubble(m models.ChatMessage, own bool) {
+	if own {
+		<div class="bubble bubble--out">
+			<p>{ m.Body }</p>
+		</div>
+	} else {
+		<div class="bubble bubble--in">
+			<p>{ m.Body }</p>
+		</div>
+	}
+}
+
+// ChatList adalah fragmen polling HTMX (tanpa layout).
+templ ChatList(ms []models.ChatMessage, me uint) {
+	for _, m := range ms {
+		@ChatBubble(m, m.SenderID == me)
+	}
+}

@@ -1,0 +1,26 @@
+package pages
+
+import (
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// Signup menampilkan form daftar.
+templ Signup(errMsg string) {
+	@layout.Base("Sign Up") {
+		<main class="page page--center">
+			<h1 class="title">SIGN UP</h1>
+			<p class="muted">Jadi bagian dari komunitas kami!</p>
+			if errMsg != "" {
+				<p class="formerror" role="alert">{ errMsg }</p>
+			}
+			<form method="POST" action="/signup" class="form">
+				@components.Field("name", "text", "Nama", "name")
+				@components.Field("email", "email", "Email", "email")
+				@components.Field("password", "password", "Sandi (min. 8)", "new-password")
+				<button class="btn" type="submit">Buat Akun</button>
+			</form>
+			<p class="muted">Sudah Punya Akun? <a href="/login"><strong>Login</strong></a></p>
+		</main>
+	}
+}

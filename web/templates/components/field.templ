@@ -1,0 +1,14 @@
+package components
+
+// Field adalah input berlatar surface + radius input (DESIGN Bab input).
+templ Field(name, inputType, placeholder, autocomplete string) {
+	<label class="field">
+		<input
+			type={ inputType }
+			name={ name }
+			placeholder={ placeholder }
+			autocomplete={ autocomplete }
+			required
+		/>
+	</label>
+}

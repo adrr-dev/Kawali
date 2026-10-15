@@ -1,0 +1,65 @@
+package pages
+
+import (
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// RewardView satu baris reward untuk template.
+type RewardView struct {
+	Reward    string
+	Name      string
+	Cost      int
+	CanAfford bool
+	Shortage  int
+}
+
+// PoinData diisi handler /poin.
+type PoinData struct {
+	Balance int
+	Level   string
+	Rewards []RewardView
+	Error   string
+}
+
+// Poin menampilkan level, cara dapat, dan tukar reward.
+templ Poin(d PoinData) {
+	@layout.Base("Poin & Dampak") {
+		<main class="page">
+			<h1 class="title">POIN & DAMPAK</h1>
+			if d.Error != "" {
+				<p class="formerror" role="alert">{ d.Error }</p>
+			}
+			<div class="levelcard">
+				<p class="bignum">{ components.Itoa(d.Balance) }</p>
+				<p>{ d.Level }</p>
+			</div>
+			<h2>Cara mendapatkan poin</h2>
+			<ul class="earnlist">
+				<li>Beli barang thrift <span>+10</span></li>
+				<li>Jual dengan foto lengkap dan ukuran asli <span>+15</span></li>
+				<li>Tanpa retur (pas dengan ukuranmu) <span>+5</span></li>
+				<li>Serahkan barang rusak ke rework loop <span>+20</span></li>
+				<li>Ajak teman yang bertransaksi <span>+25</span></li>
+			</ul>
+			<h2>Tukar poin</h2>
+			for _, rw := range d.Rewards {
+				<div class="reward">
+					<div>
+						<p><strong>{ rw.Name }</strong></p>
+						<p class="muted">{ components.Itoa(rw.Cost) } poin</p>
+					</div>
+					if rw.CanAfford {
+						<form method="POST" action="/redeem">
+							<input type="hidden" name="reward" value={ rw.Reward }/>
+							<button class="btn btn--small" type="submit">Tukar</button>
+						</form>
+					} else {
+						<p class="muted">Kurang { components.Itoa(rw.Shortage) }</p>
+					}
+				</div>
+			}
+		</main>
+		@components.Dock("profil")
+	}
+}

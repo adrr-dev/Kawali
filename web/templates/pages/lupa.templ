@@ -1,0 +1,25 @@
+package pages
+
+import (
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// Lupa menampilkan form reset + respons netral (tanpa bocorkan email).
+templ Lupa(sent bool) {
+	@layout.Base("Lupa Sandi") {
+		<main class="page page--center">
+			<h1 class="title">LUPA SANDI?</h1>
+			if sent {
+				<p class="muted">Bila emailmu terdaftar, tautan reset sudah dikirim. Cek kotak masukmu ya.</p>
+				<p><a href="/login">Kembali ke Login</a></p>
+			} else {
+				<p class="muted">Masukkan emailmu dan kami akan mengirimkan link untuk memperbarui sandi.</p>
+				<form method="POST" action="/lupa-sandi" class="form">
+					@components.Field("email", "email", "Email", "email")
+					<button class="btn" type="submit">Kirim</button>
+				</form>
+			}
+		</main>
+	}
+}

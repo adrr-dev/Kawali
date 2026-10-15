@@ -1,0 +1,32 @@
+package pages
+
+import (
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// AdminOverviewData ringkasan operasional.
+type AdminOverviewData struct {
+	Users        int64
+	Products     int64
+	PendingOrder int64
+	DoneOrder    int64
+	OpenReports  int64
+}
+
+// AdminOverview menampilkan metrik + navigasi moderasi.
+templ AdminOverview(d AdminOverviewData) {
+	@layout.Base("Admin") {
+		<main class="page">
+			<h1 class="title">ADMIN</h1>
+			<div class="admgrid">
+				<div class="admcard"><p class="bignum">{ components.Itoa64(d.Users) }</p><p class="muted">Pengguna</p></div>
+				<div class="admcard"><p class="bignum">{ components.Itoa64(d.Products) }</p><p class="muted">Listing</p></div>
+				<div class="admcard"><p class="bignum">{ components.Itoa64(d.PendingOrder) }</p><p class="muted">Transaksi pending</p></div>
+				<div class="admcard"><p class="bignum">{ components.Itoa64(d.DoneOrder) }</p><p class="muted">Transaksi done</p></div>
+				<div class="admcard"><p class="bignum">{ components.Itoa64(d.OpenReports) }</p><p class="muted">Laporan terbuka</p></div>
+			</div>
+			<p><a href="/admin/laporan">Moderasi laporan</a> · <a href="/admin/produk">Moderasi produk</a> · <a href="/admin/transaksi">Transaksi</a></p>
+		</main>
+	}
+}

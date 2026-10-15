@@ -1,0 +1,47 @@
+package pages
+
+import (
+	"strconv"
+
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// PreferensiData diisi handler /preferensi.
+type PreferensiData struct {
+	Sizes models.SizePreference
+	Label string
+	Lat   float64
+	Lng   float64
+}
+
+// Preferensi menampilkan form ukuran + lokasi manual.
+templ Preferensi(d PreferensiData) {
+	@layout.Base("Preferensi") {
+		<main class="page">
+			<h1 class="title">PREFERENSI</h1>
+			<p class="muted">Setel preferensi ukuran kamu untuk memudahkanmu di kemudian hari.</p>
+			<form method="POST" action="/preferensi" class="form">
+				<label class="field"><input type="number" name="dada" min="0" step="0.1" placeholder="Lebar Dada (cm)" value={ fnum(d.Sizes.Dada) }/></label>
+				<label class="field"><input type="number" name="pinggang" min="0" step="0.1" placeholder="Lingkar Pinggang (cm)" value={ fnum(d.Sizes.Pinggang) }/></label>
+				<label class="field"><input type="number" name="pinggul" min="0" step="0.1" placeholder="Lingkar Pinggul (cm)" value={ fnum(d.Sizes.Pinggul) }/></label>
+				<label class="field"><input type="number" name="tinggi" min="0" step="0.1" placeholder="Tinggi Badan (cm)" value={ fnum(d.Sizes.Tinggi) }/></label>
+				<label class="field"><input type="number" name="torso" min="0" step="0.1" placeholder="Panjang Torso (cm)" value={ fnum(d.Sizes.Torso) }/></label>
+				<h2>Lokasi</h2>
+				<label class="field"><input type="text" name="location" placeholder="Patokan lokasi (mis. Jakarta Selatan)" value={ d.Label }/></label>
+				<label class="field"><input type="number" name="lat" step="0.000001" placeholder="Latitude" value={ fnum(d.Lat) }/></label>
+				<label class="field"><input type="number" name="lng" step="0.000001" placeholder="Longitude" value={ fnum(d.Lng) }/></label>
+				<button class="btn" type="submit">Simpan Preferensi</button>
+			</form>
+		</main>
+		@components.Dock("profil")
+	}
+}
+
+func fnum(f float64) string {
+	if f == 0 {
+		return ""
+	}
+	return strconv.FormatFloat(f, 'f', -1, 64)
+}

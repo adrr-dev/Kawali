@@ -1,0 +1,45 @@
+package pages
+
+import (
+	"mewali/internal/models"
+	"mewali/web/templates/components"
+	"mewali/web/templates/layout"
+)
+
+// SearchData diisi handler /cari.
+type SearchData struct {
+	Q        string
+	Category string
+	Items    []models.Product
+	Covers   map[uint]string
+}
+
+// Search menampilkan pencarian + chip kategori + grid 2 kolom.
+templ Search(d SearchData) {
+	@layout.Base("Pencarian") {
+		<main class="page">
+			<h1 class="title">PENCARIAN</h1>
+			<form method="GET" action="/cari" class="form">
+				<label class="field">
+					<input type="search" name="q" value={ d.Q } placeholder="Cari pakaian..."/>
+				</label>
+			</form>
+			<div class="chips" role="list">
+				<a class="chip" href="/cari">Semua</a>
+				for _, c := range models.Categories {
+					<a class="chip" href={ templ.URL("/cari?cat=" + c) }>{ c }</a>
+				}
+			</div>
+			if len(d.Items) == 0 {
+				<p class="muted">Tidak ada hasil. Coba kata kunci atau kategori lain.</p>
+			} else {
+				<div class="grid">
+					for _, p := range d.Items {
+						@components.ProductCard(p, d.Covers[p.ID])
+					}
+				</div>
+			}
+		</main>
+		@components.Dock("cari")
+	}
+}
